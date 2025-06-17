@@ -1,0 +1,111 @@
+/* Basic Reset & Border Box Fix */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #13583A;
+    color: #fff;
+    font-family: 'Fredoka', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Wrapper */
+#wrapper {
+    width: 80%;
+    margin: 0 auto;
+}
+
+/* Header, Nav, Footer */
+header, nav, footer {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+header {
+    background-color: #1b5e20;
+}
+
+nav {
+    background-color: #2e7d32;
+}
+
+footer {
+    background-color: #66bb6a;
+    clear: both;
+}
+
+/* Layout */
+main {
+    float: left;
+    width: 70%;
+}
+
+aside {
+    float: right;
+    width: 28%;
+    background-color: #e53935;
+    padding: 15px;
+    color: white;
+    border-radius: 10px;
+    margin-left: 2%;
+    min-height: 700px; /* Adjust based on your article height */
+}
+
+/* Article and Sections */
+article {
+    background-color: #6a1b9a;
+    padding: 20px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+section {
+    background-color: #ffca28;
+    float: left;
+    width: 30%;
+    margin: 1.5%;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    font-size: 0.95em;
+    line-height: 1.5;
+    color: #333;
+}
+
+section:hover {
+    transform: scale(1.05);
+    background-color: #ffe082;
+}
+
+
+
+/* Footer clears floats */
+footer {
+    background-color: #7cbba0;
+    clear: both;
+    float: none;
+    text-align: center;
+    padding: 30px;
+}
+
+@media screen and (max-width: 768px) {
+    section {
+        flex: 1 1 100%;
+    }
+
+    aside {
+        width: 100%;
+        float: none;
+        margin-top: 20px;
+    }
+}
+
+
