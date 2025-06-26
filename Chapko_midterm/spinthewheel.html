@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>🎡 Fortune Wheel | Digital Carnival</title>
+  <link href="https://fonts.googleapis.com/css2?family=Freckle+Face&display=swap" rel="stylesheet" />
+  <style>
+    @keyframes sparkle {
+
+      0%,
+      100% {
+        opacity: 0.3;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+
+    body {
+      font-family: 'Freckle Face', cursive;
+      background: radial-gradient(circle at center, #23004d 0%, #1a0033 80%);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle, #ffd700 1px, transparent 1px),
+        radial-gradient(circle, #ff69b4 1.2px, transparent 1.2px),
+        radial-gradient(circle, #00ffff 1.1px, transparent 1.1px);
+      background-position: 10% 20%, 50% 80%, 80% 40%;
+      background-repeat: repeat;
+      background-size: 100px 100px;
+      animation: sparkle 3s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    .wrapper {
+      padding: 40px;
+      max-width: 900px;
+      margin: 50px auto;
+      border: 4px solid #FFD700;
+      box-shadow: 0 0 40px #ff69b4, 0 0 30px #FFD700;
+      background: linear-gradient(135deg, #3a0066, #1a0033);
+      border-radius: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header h1 {
+      font-size: 3.2rem;
+      color: #ff69b4;
+      text-shadow: 3px 3px 8px #ff1493;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.3rem;
+      color: #e0b3ff;
+      text-shadow: 1px 1px 3px #330033;
+    }
+
+    #wheel-container {
+      position: relative;
+      margin: 50px auto;
+      width: 320px;
+      height: 320px;
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px double #ff69b4;
+      background: conic-gradient(#ffcc00 0deg 18deg,
+          #ff69b4 18deg 36deg,
+          #8a2be2 36deg 54deg,
+          #00ffff 54deg 72deg,
+          #ff4500 72deg 90deg,
+          #9932cc 90deg 108deg,
+          #ffcc00 108deg 126deg,
+          #ff69b4 126deg 144deg,
+          #8a2be2 144deg 162deg,
+          #00ffff 162deg 180deg,
+          #ff4500 180deg 198deg,
+          #9932cc 198deg 216deg,
+          #ffcc00 216deg 234deg,
+          #ff69b4 234deg 252deg,
+          #8a2be2 252deg 270deg,
+          #00ffff 270deg 288deg,
+          #ff4500 288deg 306deg,
+          #9932cc 306deg 324deg,
+          #ffcc00 324deg 342deg,
+          #ff69b4 342deg 360deg);
+      transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
+      box-shadow: 0 0 30px #ff69b4;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+      outline: none;
+    }
+
+    .wheel-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0 0;
+      /* stay here */
+      width: 100px;
+      font-size: 0.65rem;
+      text-align: left;
+      color: white;
+      font-weight: bold;
+      white-space: nowrap;
+      text-shadow: 1px 1px 2px #000;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .wheel-label:hover {
+      text-shadow: 0 0 5px #fff;
+    }
+
+
+    #pointer {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 30px solid #ff1493;
+      z-index: 10;
+      filter: drop-shadow(0 0 5px #ff1493);
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 14px 28px;
+      font-size: 1.3rem;
+      background: linear-gradient(to right, #ff69b4, #ff1493);
+      color: #222;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ff1493;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background: linear-gradient(to right, #ff1493, #ff69b4);
+    }
+
+    #fortune-result {
+      margin-top: 35px;
+      font-size: 1.7rem;
+      color: #90ee90;
+      text-shadow: 1px 1px 3px #000;
+      min-height: 60px;
+      opacity: 0;
+      transition: opacity 0.6s ease-in;
+      white-space: pre-line;
+    }
+
+    .show {
+      opacity: 1;
+    }
+
+    footer a {
+      display: inline-block;
+      margin-top: 50px;
+      font-size: 1.2rem;
+      color: #ff69b4;
+      text-decoration: none;
+      background-color: #330033;
+      padding: 12px 24px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff69b4;
+    }
+
+    footer a:hover {
+      background-color: #4b0073;
+      color: #fff;
+    }
+
+    #fortune-banner {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(50, 0, 70, 0.95);
+      color: #ff69b4;
+      font-size: 2.4rem;
+      font-weight: bold;
+      padding: 15px 40px;
+      border: 4px solid #ff1493;
+      border-radius: 20px;
+      box-shadow: 0 0 40px #ff1493;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      z-index: 9999;
+      max-width: 90vw;
+      white-space: nowrap;
+      user-select: none;
+      text-shadow: 0 0 8px #ff1493;
+    }
+
+    #fortune-banner.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* New styles for table and list */
+    section.stats-table {
+      margin-top: 40px;
+      font-family: 'Freckle Face', cursive;
+      color: #ff69b4;
+      font-size: 1.2rem;
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    section.stats-table table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    section.stats-table th,
+    section.stats-table td {
+      border: 2px solid #ff69b4;
+      padding: 10px;
+    }
+
+    section.stats-table th {
+      background-color: #330033;
+    }
+
+    section.instructions {
+      margin-top: 40px;
+      color: #ff69b4;
+      font-family: 'Freckle Face', cursive;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    section.instructions ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+
+    /* Responsive wheel */
+    @media (max-width: 400px) {
+      #wheel-container {
+        width: 250px;
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>🎪 The Fortune Wheel</h1>
+      <p>Spin the wheel to reveal your carnival fate...</p>
+    </header>
+
+    <main>
+      <div id="wheel-container">
+        <div id="pointer"></div>
+        <div id="wheel" onclick="spinWheel()" tabindex="0" aria-label="Fortune wheel, press Enter or Space to spin">
+        </div>
+      </div>
+      <button onclick="spinWheel()">🎯 Spin the Wheel</button>
+      <p id="fortune-result" aria-live="polite"></p>
+
+      <!-- Added table section -->
+      <section class="stats-table" aria-label="Fortune wheel statistics">
+        <h2>🎟️ Fortune Wheel Stats</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Fortune</th>
+              <th>Luck Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Glowing Popcorn Surprise</td>
+              <td>⭐⭐⭐</td>
+            </tr>
+            <tr>
+              <td>Whispering Haunted Carousel</td>
+              <td>⭐⭐</td>
+            </tr>
+            <tr>
+              <td>Spellbound Joy Ride</td>
+              <td>⭐⭐⭐⭐</td>
+            </tr>
+            <tr>
+              <td>Magic Carnival Ticket</td>
+              <td>⭐⭐⭐⭐⭐</td>
+            </tr>
+            <tr>
+              <td>Fortune Cookie Code</td>
+              <td>⭐⭐⭐⭐⭐</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Added instructions list -->
+      <section class="instructions" aria-label="How to play instructions">
+        <h2>🎉 How to Play</h2>
+        <ul>
+          <li>Click the wheel or the button to spin your fortune.</li>
+          <li>Listen for the magical spin sound.</li>
+          <li>Watch for the confetti celebration!</li>
+          <li>Share your fortune with friends.</li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- 🎠 Carnival Gallery -->
+<section class="gallery-grid" aria-label="Carnival Photo Gallery">
+  <h2 style="color: #ff69b4; text-align: center; margin-top: 60px;">📸 Carnival Photo Gallery</h2>
+  <div style="display: grid; gap: 15px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 30px auto; max-width: 800px;">
+    <img src="images/ticket_booth.jpg" alt="Carnival ticket booth glowing at night" style="width: 100%; border-radius: 12px; border: 4px solid #ff69b4; box-shadow: 0 0 20px #ff1493;">
+    <img src="images/ferris_wheel.jpg" alt="Colorful Ferris wheel lit up against the night sky" style="width: 100%; border-radius: 12px; border: 4px solid #ffd700; box-shadow: 0 0 20px #ffb6c1;">
+</section>
+
+
+    <footer>
+      <p><a href="index.html">🔙 Return to the Carnival Gate</a></p>
+      <p style="font-size: 0.8rem; margin-top: 15px; color: #ff69b4;">
+        <a href="https://github.com/catdad/canvas-confetti" target="_blank" rel="noopener noreferrer"
+          style="color:#ffd700;">canvas-confetti</a>.
+      </p>
+    </footer>
+  </div>
+
+  <div id="fortune-banner"></div>
+
+  <audio id="spin-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-spin-2584.mp3"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    const wheel = document.getElementById("wheel");
+    const resultEl = document.getElementById("fortune-result");
+    const fortuneBanner = document.getElementById("fortune-banner");
+    const spinSound = document.getElementById("spin-sound");
+
+    const fortunes = [
+      "🎆 Glowing Popcorn Surprise",
+      "👻 Whispering Haunted Carousel",
+      "💡 Viral Idea Explosion",
+      "🧙‍♀️ Spellbound Joy Ride",
+      "🍬 Cotton Candy Twist",
+      "🔮 Mirror of Mysteries",
+      "🎠 Dreamy Unicorn Dash",
+      "🎁 Magic Carnival Ticket",
+      "🦄 Starlit Lucky Charm",
+      "🌈 Rainbow Gumball Rain",
+      "🎭 Jester’s Fortune Laugh",
+      "💥 Firecracker Fortune Boom",
+      "📦 Mystery Treasure Box",
+      "🥠 Fortune Cookie Code",
+      "🪄 Wand of Wonders",
+      "🎩 Enchanted Top Hat",
+      "🍿 Trickster's Snack Attack",
+      "🌟 Starry Sparkle Spell",
+      "🍀 Clover Jackpot",
+      "🎇 Finale Fireworks Blast"
+    ];
+
+    function createLabels() {
+      const segmentAngle = 360 / fortunes.length;
+      const radius = 40; // better for spacing
+      fortunes.forEach((fortune, i) => {
+        const label = document.createElement('div');
+        label.className = 'wheel-label';
+        const angle = segmentAngle * i;
+
+        // Position the label outwards and rotate it with the slice
+        label.style.transform = `
+      rotate(${angle}deg)
+      translate(${radius}px)
+      rotate(${segmentAngle / 2 - 5}deg)
+    `;
+
+        label.textContent = fortune;
+        wheel.appendChild(label);
+      });
+    }
+
+    createLabels();
+
+    let spinning = false;
+    let currentRotation = 0;
+
+    function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+
+      const segmentAngle = 360 / fortunes.length;
+      const randomIndex = Math.floor(Math.random() * fortunes.length);
+      const extraSpin = 360 * 10;
+      const stopAngle = (360 - randomIndex * segmentAngle - segmentAngle / 2);
+      const spinAmount = extraSpin + stopAngle;
+
+      currentRotation += spinAmount;
+
+      wheel.style.transition = 'transform 4s cubic-bezier(0.33, 1, 0.68, 1)';
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      resultEl.classList.remove("show");
+      resultEl.textContent = "";
+      fortuneBanner.classList.remove("show");
+      spinSound.play();
+
+      setTimeout(() => {
+        const text = fortunes[randomIndex];
+        const isCookie = text.includes("Fortune Cookie Code");
+        const bonus = isCookie ? "\n🔐 Your code: LUCKY-8-DAYZ\n✨ Use it wisely before sunset." : "";
+
+        resultEl.textContent = `🎉 ${text} 🎉${bonus}`;
+        resultEl.classList.add("show");
+
+        fortuneBanner.textContent = `🎉 ${text} 🎉`;
+        fortuneBanner.classList.add("show");
+
+        launchConfetti();
+        spinning = false;
+
+        setTimeout(() => {
+          fortuneBanner.classList.remove("show");
+        }, 5000);
+      }, 4200);
+    }
+
+    // Keyboard support: spin on Enter or Space
+    wheel.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        spinWheel();
+      }
+    });
+
+    function launchConfetti() {
+      const duration = 1000;
+      const end = Date.now() + duration;
+      const colors = ['#ff69b4', '#ffd700', '#00ffff', '#9932cc'];
+      (function frame() {
+        confetti({
+          particleCount: 4,
+          angle: 60,
+          spread: 55,
+          origin: {
+            x: 0
+          },
+          colors
+        });
+        confetti({
+          particleCount: 4,
+          angle: 120,
+          spread: 55,
+          origin: {
+            x: 1
+          },
+          colors
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎢 The Final Ride | Digital Carnival</title>
+  <link href="https://fonts.googleapis.com/css2?family=Freckle+Face&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #0d001a, #2b0040);
+      font-family: 'Freckle Face', cursive;
+      color: white;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 4rem;
+      color: #ff69b4;
+      text-shadow: 3px 3px 10px #ff1493;
+      margin-top: 30px;
+    }
+
+    .ride-wrapper {
+      width: 100%;
+      overflow: hidden;
+      padding: 20px 0;
+    }
+
+    .ride-track {
+      display: flex;
+      gap: 30px;
+      animation: ride 20s linear infinite;
+      width: max-content;
+    }
+
+    @keyframes ride {
+      0% {
+        transform: translateX(100%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    .ride-car {
+      background: #330033;
+      border: 4px solid #ff69b4;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #ff1493;
+      padding: 30px;
+      min-width: 300px;
+      text-align: center;
+      flex-shrink: 0;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* Spin animation */
+    .spin {
+      animation: spin 1s linear forwards;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .ride-car:hover {
+      transform: scale(1.05) rotate(-2deg);
+      box-shadow: 0 0 40px #ff1493, 0 0 10px 5px #fff;
+    }
+
+    .ride-car:hover::after {
+      content: '✨';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.5rem;
+      animation: sparkle 1.5s infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .ride-car img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 15px;
+      border: 3px solid #ffd700;
+      box-shadow: 0 0 10px #ff69b4;
+      transition: transform 0.3s ease;
+      pointer-events: none; /* so clicks pass through image */
+    }
+
+    .ride-car img:hover {
+      transform: scale(1.1);
+    }
+
+    .quote {
+      font-size: 1.3rem;
+      margin-top: 15px;
+      color: #ffccff;
+      user-select: none;
+    }
+
+    .button-bar {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .fun-btn {
+      font-size: 1.3rem;
+      background: linear-gradient(to right, #ff69b4, #ff1493);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #ff69b4;
+      margin: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .fun-btn:hover {
+      background: #ff2d8e;
+      transform: scale(1.1);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin: 50px auto;
+      font-size: 1.5rem;
+      color: #ffd700;
+      text-decoration: none;
+      background: #330033;
+      padding: 12px 24px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #ff69b4;
+      width: fit-content;
+    }
+
+    .back-link:hover {
+      background: #4b0073;
+      color: white;
+    }
+
+    /* Confetti container */
+    #confetti-container {
+      pointer-events: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      overflow: visible;
+      z-index: 9999;
+    }
+
+    /* Music toggle button */
+    #musicToggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(to right, #ff69b4, #ff1493);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 15px #ff69b4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #musicToggle:hover {
+      background: #ff2d8e;
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <h1>🎢 The Final Ride</h1>
+
+  <div class="ride-wrapper">
+    <div class="ride-track" id="rideTrack">
+      <div class="ride-car">
+        <img src="https://placekitten.com/400/300" alt="Memory 1" />
+        <p class="quote">"You glow with the confusion of a thousand stars."</p>
+      </div>
+      <div class="ride-car">
+        <img src="https://placebear.com/400/300" alt="Memory 2" />
+        <p class="quote">"If chaos was a crown, you’d wear it regally."</p>
+      </div>
+      <div class="ride-car">
+        <img src="https://placebeard.it/400x300" alt="Memory 3" />
+        <p class="quote">"Dapper chaos. Mirror-approved."</p>
+      </div>
+      <div class="ride-car">
+        <img src="https://picsum.photos/400/300?grayscale" alt="Memory 4" />
+        <p class="quote">"Drama and magic follow you like a shadow."</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="button-bar">
+    <button class="fun-btn" onclick="shuffleRide()">🔄 Shuffle the Ride</button>
+    <button class="fun-btn" onclick="addRandomCar()">🎁 Add Surprise Car</button>
+  </div>
+
+  <a class="back-link" href="index.html">🔙 Return to Carnival Map</a>
+
+  <button id="musicToggle" title="Toggle Music">🎵</button>
+
+  <div id="confetti-container"></div>
+
+  <audio id="backgroundMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_aa3e734d2f.mp3?filename=happy-upbeat-pop-111273.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const track = document.getElementById('rideTrack');
+
+    // Shuffle cars
+    function shuffleRide() {
+      const cars = Array.from(track.children);
+      cars.sort(() => Math.random() - 0.5);
+      cars.forEach(car => track.appendChild(car));
+    }
+
+    // Add surprise car with confetti
+    function addRandomCar() {
+      const car = document.createElement('div');
+      car.className = 'ride-car';
+
+      const img = document.createElement('img');
+      img.src = `https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/400/300`;
+      img.alt = "Surprise Memory";
+
+      const p = document.createElement('p');
+      p.className = 'quote';
+
+      const quotes = [
+        "🎠 You're a carnival legend!",
+        "🎡 Whimsical. Wild. Wonderful.",
+        "✨ Sparkle on, mystery star.",
+        "🤹 You juggle weird and wonderful perfectly.",
+        "🎟️ Ticket to fabulous weirdness granted."
+      ];
+      p.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+      car.appendChild(img);
+      car.appendChild(p);
+      track.appendChild(car);
+
+      car.scrollIntoView({ behavior: 'smooth', inline: 'end' });
+      launchConfetti();
+    }
+
+    // Spin car on click
+    track.addEventListener('click', e => {
+      const car = e.target.closest('.ride-car');
+      if (!car) return;
+      car.classList.add('spin');
+      setTimeout(() => car.classList.remove('spin'), 1000);
+    });
+
+    // Remove car on double click
+    track.addEventListener('dblclick', e => {
+      const car = e.target.closest('.ride-car');
+      if (!car) {
+        return;
+      }
+      car.remove();
+    });
+
+    // Confetti effect
+    function launchConfetti() {
+      const container = document.getElementById('confetti-container');
+      for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.textContent = '🎉';
+        confetti.style.position = 'fixed';
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.top = '-30px';
+        confetti.style.fontSize = (10 + Math.random() * 20) + 'px';
+        confetti.style.animation = `confettiFall 3s linear forwards`;
+        confetti.style.opacity = '1';
+        container.appendChild(confetti);
+
+        // Animate fall
+        confetti.animate([
+          { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+          { transform: `translateY(${window.innerHeight + 50}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+        ], {
+          duration: 3000,
+          easing: 'linear'
+        });
+
+        // Remove confetti after animation
+        setTimeout(() => confetti.remove(), 3000);
+      }
+    }
+
+    // Music toggle
+    const musicToggle = document.getElementById('musicToggle');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+
+    musicToggle.addEventListener('click', () => {
+      if (backgroundMusic.paused) {
+        backgroundMusic.play();
+        musicToggle.textContent = '🔈';
+      } else {
+        backgroundMusic.pause();
+        musicToggle.textContent = '🎵';
+      }
+    });
+  </script>
+
+  <style>
+    /* Confetti keyframes */
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</body>
+</html>
