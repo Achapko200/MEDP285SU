@@ -1,0 +1,110 @@
+body {
+  margin: 0;
+  font-family: 'Trebuchet MS', sans-serif;
+  background: linear-gradient(to bottom, #e0f7fa, #c8e6c9);
+  background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+  color: #2e7d32;
+  overflow: hidden;
+}
+
+h1 {
+  text-align: center;
+  margin: 20px 0 10px;
+  font-size: 2rem;
+  color: #1b5e20;
+  text-shadow: 1px 1px #a5d6a7;
+}
+
+.intro {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: #33691e;
+}
+
+.container {
+  position: absolute;
+  top: 0;
+  width: 15%;
+  height: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+#left-container { left: 0; }
+#right-container { right: 0; }
+
+.plant-holder {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.plant {
+  width: 80px;
+  cursor: grab;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 0 5px #66bb6a);
+}
+.plant:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 12px #81c784);
+}
+.cloned-plant:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 10px #a5d6a7);
+  cursor: grabbing;
+}
+
+#terrarium {
+  position: absolute;
+  top: 12%;
+  left: 20%;
+  width: 60%;
+  height: 75%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1;
+}
+
+.glass-dome {
+  width: 100%;
+  height: 90%;
+  border-radius: 50% / 30%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 5px solid #aed581;
+  box-shadow: 0 0 30px rgba(139, 195, 74, 0.7) inset;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-effect {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.2), transparent 70%);
+  pointer-events: none;
+}
+
+.mystic-soil {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 8%;
+  background: #4e342e;
+  border-radius: 0 0 50% 50% / 20%;
+  box-shadow: inset 0 5px 10px #3e2723;
+}
+
+footer {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #689f38;
+}
+
