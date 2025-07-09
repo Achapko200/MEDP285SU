@@ -1,0 +1,19 @@
+/* Remove default browser spacing */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #f0f0f0; /* light background for contrast */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* prevents scrollbars */
+  font-family: sans-serif;
+}
+
+/* Make canvas display nicely without white gaps */
+canvas {
+  display: block;
+  border: 2px solid #333; /* optional: adds a visible canvas border */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* subtle shadow for visual depth */
+}
