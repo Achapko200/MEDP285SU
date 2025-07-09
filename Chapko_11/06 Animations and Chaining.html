@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Ultimate jQuery Animations</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 40px;
+      background-color: #f8f9fa;
+      color: #212529;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    h1 {
+      background-color: #339af0;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      font-weight: 300;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+      transition: background-color 0.4s ease;
+    }
+
+    body.dark-mode h1 {
+      background-color: #0d6efd;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    }
+
+    #animatedDiv {
+      position: relative;
+      width: 150px;
+      height: 100px;
+      margin: 10px 0;
+      padding: 20px;
+      background: #b3c8d0;
+      border: 1px solid black;
+      font-size: 16pt;
+      cursor: grab;
+      transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.3s ease;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body.dark-mode #animatedDiv {
+      background: #2c2f33;
+      border-color: #ddd;
+      color: #e0e0e0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    button {
+      font-size: 16px;
+      padding: 10px 18px;
+      border: none;
+      background-color: #dee2e6;
+      color: #212529;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      flex: 1 1 120px;
+      min-width: 120px;
+    }
+
+    button:disabled {
+      background-color: #adb5bd;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #adb5bd;
+    }
+
+    #statusMessage {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 15px;
+      min-height: 24px;
+    }
+
+    #progressContainer {
+      width: 100%;
+      height: 12px;
+      background-color: #ced4da;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background-color: #339af0;
+      transition: width 0.3s ease;
+    }
+
+    @media (max-width: 600px) {
+      #animatedDiv {
+        width: 100%;
+        height: 120px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        min-width: auto;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Ultimate jQuery Animations</h1>
+
+  <div id="content">
+
+    <div class="button-group" role="group" aria-label="Animation controls">
+      <button id="btnRun" aria-live="polite" aria-pressed="false">Start Animation</button>
+      <button id="btnPause" disabled aria-pressed="false">Pause</button>
+      <button id="btnReset" aria-live="polite">Reset</button>
+      <button id="btnDarkMode" aria-pressed="false">Toggle Dark Mode</button>
+    </div>
+
+    <div id="statusMessage" aria-live="polite" aria-atomic="true"></div>
+
+    <div id="progressContainer" aria-hidden="true">
+      <div id="progressBar"></div>
+    </div>
+
+    <div id="animatedDiv" tabindex="0" aria-label="Animated box"></div>
+
+  </div>
+
+  <audio id="beep" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function () {
+
+      let animationPaused = false;
+      let animationQueue = [];
+      let currentAnimation = null;
+      let animationProgress = 0;
+      let totalSteps = 4;
+
+      const $animatedDiv = $("#animatedDiv");
+      const $btnRun = $("#btnRun");
+      const $btnPause = $("#btnPause");
+      const $btnReset = $("#btnReset");
+      const $btnDarkMode = $("#btnDarkMode");
+      const $status = $("#statusMessage");
+      const $progressBar = $("#progressBar");
+      const beepSound = document.getElementById("beep");
+
+      function playBeep() {
+        beepSound.currentTime = 0;
+        beepSound.play();
+      }
+
+      function updateStatus(msg) {
+        $status.text(msg);
+      }
+
+      function updateProgress(step) {
+        animationProgress = step;
+        const percent = (animationProgress / totalSteps) * 100;
+        $progressBar.css("width", percent + "%");
+      }
+
+      function stopAnimation() {
+        $animatedDiv.stop(true, true);
+        animationQueue = [];
+        currentAnimation = null;
+        animationPaused = false;
+        animationProgress = 0;
+        updateProgress(0);
+        $btnPause.prop("disabled", true).attr("aria-pressed", "false").text("Pause");
+      }
+
+      // Drag to move support
+      let dragging = false,
+        dragStartX = 0,
+        dragStartY = 0,
+        origLeft = 0,
+        origTop = 0;
+
+      $animatedDiv.on("mousedown touchstart", function (e) {
+        e.preventDefault();
+        dragging = true;
+        dragStartX = e.pageX || e.originalEvent.touches[0].pageX;
+        dragStartY = e.pageY || e.originalEvent.touches[0].pageY;
+        origLeft = parseInt($animatedDiv.css("left")) || 0;
+        origTop = parseInt($animatedDiv.css("top")) || 0;
+        $animatedDiv.css("cursor", "grabbing");
+      });
+
+      $(document).on("mousemove touchmove", function (e) {
+        if (dragging) {
+          const currentX = e.pageX || e.originalEvent.touches[0].pageX;
+          const currentY = e.pageY || e.originalEvent.touches[0].pageY;
+          const dx = currentX - dragStartX;
+          const dy = currentY - dragStartY;
+          $animatedDiv.css({
+            left: origLeft + dx,
+            top: origTop + dy
+          });
+        }
+      });
+
+      $(document).on("mouseup touchend", function () {
+        if (dragging) {
+          dragging = false;
+          $animatedDiv.css("cursor", "grab");
+          updateStatus("Drag finished.");
+        }
+      });
+
+      function animateStep(props, duration, easing, message, stepIndex, next) {
+        updateStatus(message);
+        updateProgress(stepIndex);
+        playBeep();
+
+        currentAnimation = $animatedDiv.animate(props, duration, easing, function () {
+          next();
+        });
+      }
+
+      function runAnimations() {
+        animationQueue = [
+          (next) => animateStep({
+            width: 400,
+            height: 150,
+            backgroundColor: "#90caf9"
+          }, 1300, "easeInOutQuad", "Resizing width and height", 1, next),
+          (next) => animateStep({
+            height: 300,
+            backgroundColor: "#64b5f6"
+          }, 400, "easeInOutQuad", "Increasing height", 2, next),
+          (next) => animateStep({
+            left: 200,
+            top: "+=100",
+            borderWidth: 8,
+            borderColor: "#1c7ed6",
+            backgroundColor: "#42a5f5"
+          }, 800, "easeInOutQuad", "Moving position and thickening border", 3, next),
+          (next) => {
+            $animatedDiv.css("box-shadow", "0 8px 15px rgba(0,0,0,0.2)");
+            updateStatus("Animation complete.");
+            updateProgress(4);
+            playBeep();
+            next();
+          }
+        ];
+
+        function nextStep() {
+          if (animationPaused) {
+            updateStatus("Animation paused.");
+            return;
+          }
+          if (animationQueue.length > 0) {
+            const step = animationQueue.shift();
+            step(nextStep);
+          } else {
+            // Animation finished
+            $btnRun.prop("disabled", false).attr("aria-pressed", "false");
+            $btnPause.prop("disabled", true).attr("aria-pressed", "false").text("Pause");
+          }
+        }
+
+        $btnRun.prop("disabled", true).attr("aria-pressed", "true");
+        $btnPause.prop("disabled", false).attr("aria-pressed", "false").text("Pause");
+        animationPaused = false;
+        updateProgress(0);
+        nextStep();
+      }
+
+      $.easing.easeInOutQuad = function (x, t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) return c / 2 * t * t + b;
+        t--;
+        return -c / 2 * (t * (t - 2) - 1) + b;
+      };
+
+      $btnRun.on("click", () => {
+        stopAnimation();
+        runAnimations();
+      });
+
+      $btnPause.on("click", () => {
+        if (!animationPaused) {
+          $animatedDiv.stop();
+          animationPaused = true;
+          $btnPause.text("Resume").attr("aria-pressed", "true");
+          updateStatus("Animation paused.");
+        } else {
+          animationPaused = false;
+          $btnPause.text("Pause").attr("aria-pressed", "false");
+          updateStatus("Resuming animation...");
+          runAnimations();
+        }
+      });
+
+      $btnReset.on("click", () => {
+        stopAnimation();
+        $animatedDiv.css({
+          width: "150px",
+          height: "100px",
+          left: "0px",
+          top: "0px",
+          borderWidth: "1px",
+          borderColor: "black",
+          backgroundColor: "#b3c8d0",
+          boxShadow: "none"
+        });
+        updateStatus("Animation reset.");
+        $btnRun.prop("disabled", false).attr("aria-pressed", "false");
+      });
+
+      $btnDarkMode.on("click", () => {
+        $("body").toggleClass("dark-mode");
+        const isDark = $("body").hasClass("dark-mode");
+        $btnDarkMode.attr("aria-pressed", isDark.toString());
+        updateStatus(`Dark mode ${isDark ? "enabled" : "disabled"}.`);
+      });
+
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Better Eddita Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f8f9fa;
+      color: #212529;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #flip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 25px;
+      background: linear-gradient(135deg, #4dabf7, #339af0);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    #flip:hover {
+      background: linear-gradient(135deg, #228be6, #1c7ed6);
+    }
+
+    .icon {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .rotate {
+      transform: rotate(180deg);
+    }
+
+    #panel {
+      display: none;
+      margin-top: 20px;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+      max-width: 600px;
+      width: 90%;
+      font-size: 1.2em;
+      line-height: 1.6;
+    }
+
+    #reset {
+      margin-top: 20px;
+      padding: 10px 18px;
+      background-color: #ced4da;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    #reset:hover {
+      background-color: #adb5bd;
+    }
+
+    @media (max-width: 600px) {
+      #flip {
+        font-size: 16px;
+        padding: 12px 20px;
+      }
+
+      #panel {
+        font-size: 1em;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button id="flip">
+    Toggle Panel
+    <span class="icon">▼</span>
+  </button>
+
+  <div id="panel">
+    👋 Hello, world! This is a better, smoother panel with clean animations and style.  
+    Use it for tooltips, tutorials, or anything interactive.
+  </div>
+
+  <button id="reset">Reset Panel</button>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("#flip").click(function () {
+        $("#panel").stop(true, true).slideToggle(300);
+        $(".icon").toggleClass("rotate");
+      });
+
+      $("#reset").click(function () {
+        $("#panel").stop(true, true).slideUp(300);
+        $(".icon").removeClass("rotate");
+      });
+    });
+  </script>
+
+</body>
+</html>

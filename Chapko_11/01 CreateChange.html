@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Creating and Changing Content</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnAppend").on("click", function () {
+                $("#example").append(" <strong>Watch This! (Appended)</strong>");
+            });
+
+            $("#btnPrepend").on("click", function () {
+                $("#example").prepend("<strong>Watch This! (Prepended) </strong>");
+            });
+
+            $("#btnHtml").on("click", function () {
+                $("#example").html("<h2>Formatted HTML added with jQuery</h2>");
+            });
+
+            $("#btnText").on("click", function () {
+                $("#example").text("Naked text added with jQuery");
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1 id="intro">Using jQuery to Create/Change Content</h1>
+    <div id="content">
+        <p>jQuery makes it very easy to create new page content and change existing page content.</p>
+        <h2 id="creation">Content Creation</h2>
+        <p>Creating new content is as simple as passing a string of HTML to the $() function.</p>
+        <h2 id="changing">Changing Content</h2>
+        <div id="example">
+            <p>text inside the example div</p>
+        </div>
+        <br>
+        <button id="btnAppend">Append</button>
+        <button id="btnPrepend">Prepend</button>
+        <button id="btnHtml">Replace with HTML</button>
+        <button id="btnText">Replace with Text</button>
+    </div>
+</body>
+</html>

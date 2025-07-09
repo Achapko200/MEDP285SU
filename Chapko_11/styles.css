@@ -1,0 +1,115 @@
+/*
+** Enhanced jQuery Training Styles
+*/
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 14pt;
+    margin: 0;
+    line-height: 1.6em;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+body > h1 {
+    background: linear-gradient(to right, #3366dd, #3355aa);
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 300;
+    margin: 0;
+    padding: 25pt 10pt 15pt;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+#content {
+    margin: 20pt auto;
+    max-width: 800px;
+    padding: 0 10pt;
+}
+
+#example, #bioContainer {
+    border: 1px solid #aaa;
+    background-color: #dbe9f4;
+    font-size: 14pt;
+    padding: 15pt;
+    min-height: 200px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.05);
+}
+
+.box {
+    background-color: #dbe9f4;
+    font-size: 14pt;
+    padding: 15pt;
+    min-height: 200px;
+    width: 300px;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.05);
+}
+
+.box p {
+    margin: 0.5em 0;
+}
+
+.smallbox {
+    background-color: #dbe9f4;
+    font-size: 14pt;
+    padding: 10pt;
+    margin-bottom: 10pt;
+    min-height: 150px;
+    width: 200px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+}
+
+.inline {
+    display: inline-block;
+    vertical-align: top;
+}
+
+code {
+    background-color: #f1f3f5;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin: 0 2px;
+    font-family: "source-code-pro", Consolas, monospace;
+    font-size: 0.95em;
+    color: #0b7285;
+}
+
+li {
+    line-height: 1.6em;
+    margin-bottom: 0.4em;
+}
+
+button {
+    font-size: 14pt;
+    margin: 8px;
+    padding: 8px 16px;
+    border: none;
+    background-color: #339af0;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #228be6;
+}
+
+#eventDetails {
+    border: 1px solid #bbb;
+    margin-top: 10pt;
+    padding: 10pt;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+.lineitem {
+    width: 120px;
+    display: inline-block;
+    font-weight: bold;
+    color: #495057;
+}

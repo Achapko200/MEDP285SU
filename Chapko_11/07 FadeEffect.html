@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Advanced Element Fading</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    p,
+    span {
+      font-size: 16pt;
+    }
+
+    button {
+      margin: 5pt 5pt 0 0;
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid #999;
+      background-color: #f0f0f0;
+      transition: background-color 0.3s ease;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      border-color: #aaa;
+    }
+
+    button:hover:not(:disabled),
+    button:focus:not(:disabled) {
+      background-color: #d0e0ff;
+      outline: none;
+    }
+
+    #theDiv.box {
+      border: 1px solid gray;
+      background-color: #b3c8d0;
+      font-size: 16pt;
+      padding: 20px;
+      min-height: 120px;
+      width: 300px;
+      margin-top: 15px;
+      text-align: center;
+      color: #222;
+      transition: background-color 0.5s ease, box-shadow 0.3s ease;
+      display: none;
+      user-select: none;
+    }
+
+    #theDiv.box.faded {
+      box-shadow: 0 0 20px #339af0;
+    }
+
+    .button-row {
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    label {
+      font-size: 14pt;
+      margin-right: 10px;
+    }
+
+    input[type="range"] {
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 600px) {
+      #theDiv.box {
+        width: 100%;
+      }
+
+      .button-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Advanced Element Fading</h1>
+  <div id="content">
+
+    <p>Page elements can be faded in or out using jQuery's fade functions. Use the controls below or keyboard shortcuts:</p>
+    <ul>
+      <li><strong>F</strong>: Toggle Fade (In/Out)</li>
+      <li><strong>I</strong>: Fade In</li>
+      <li><strong>O</strong>: Fade Out</li>
+      <li><strong>P</strong>: Start/Stop Pulsate</li>
+    </ul>
+
+    <div class="button-row" role="group" aria-label="Fade control buttons">
+      <button id="fadein" type="button">Fade In</button>
+      <button id="fadeout" type="button" disabled>Fade Out</button>
+      <button id="fadetoggle" type="button">Toggle Fade</button>
+      <button id="pulse" type="button" disabled>Start Pulsate</button>
+      <button id="stoppulse" type="button" style="display:none;">Stop Pulsate</button>
+    </div>
+
+    <div class="button-row">
+      <label for="speedRange">Animation Speed (ms):</label>
+      <input id="speedRange" type="range" min="100" max="2000" value="600" step="50" />
+      <span id="speedValue">600</span>
+    </div>
+
+    <div id="theDiv" class="box" aria-live="polite" aria-atomic="true" tabindex="0">
+      This box will fade in and out.
+    </div>
+
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    $(function () {
+      const $theDiv = $("#theDiv");
+      const $fadeInBtn = $("#fadein");
+      const $fadeOutBtn = $("#fadeout");
+      const $fadeToggleBtn = $("#fadetoggle");
+      const $pulseBtn = $("#pulse");
+      const $stopPulseBtn = $("#stoppulse");
+      const $speedRange = $("#speedRange");
+      const $speedValue = $("#speedValue");
+
+      let pulsateInterval = null;
+      let animationDuration = parseInt($speedRange.val(), 10);
+
+      // Update speed display and duration on slider change
+      $speedRange.on("input change", function () {
+        animationDuration = parseInt(this.value, 10);
+        $speedValue.text(animationDuration);
+      });
+
+      // Enable/disable buttons based on visibility
+      function updateButtons(isVisible) {
+        $fadeInBtn.prop("disabled", isVisible);
+        $fadeOutBtn.prop("disabled", !isVisible);
+        $pulseBtn.prop("disabled", !isVisible || pulsateInterval !== null);
+        $fadeToggleBtn.prop("disabled", false);
+      }
+
+      // Fade in
+      function fadeIn() {
+        if ($theDiv.is(":visible")) return;
+        $theDiv.stop(true, true).fadeIn(animationDuration, () => {
+          $theDiv.text("This box will fade in and out.");
+          $theDiv.removeClass("faded");
+          updateButtons(true);
+        });
+      }
+
+      // Fade out
+      function fadeOut() {
+        if (!$theDiv.is(":visible")) return;
+        $theDiv.stop(true, true).fadeOut(animationDuration, () => {
+          updateButtons(false);
+        });
+      }
+
+      // Toggle fade in/out
+      function fadeToggle() {
+        if ($theDiv.is(":visible")) {
+          fadeOut();
+        } else {
+          fadeIn();
+        }
+      }
+
+      // Start pulsate
+      function startPulsate() {
+        if (pulsateInterval) return;
+        $pulseBtn.hide();
+        $stopPulseBtn.show();
+        $theDiv.addClass("faded");
+        let opacity = 1;
+        pulsateInterval = setInterval(() => {
+          opacity = opacity === 1 ? 0.3 : 1;
+          $theDiv.fadeTo(animationDuration / 2, opacity);
+        }, animationDuration);
+      }
+
+      // Stop pulsate
+      function stopPulsate() {
+        if (!pulsateInterval) return;
+        clearInterval(pulsateInterval);
+        pulsateInterval = null;
+        $stopPulseBtn.hide();
+        $pulseBtn.show();
+        $theDiv.stop(true, true).fadeTo(animationDuration, 1, () => {
+          $theDiv.removeClass("faded");
+          $theDiv.text("Pulsate stopped.");
+        });
+      }
+
+      // Event handlers
+      $fadeInBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          fadeIn();
+        }
+      });
+
+      $fadeOutBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          fadeOut();
+        }
+      });
+
+      $fadeToggleBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          fadeToggle();
+        }
+      });
+
+      $pulseBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          startPulsate();
+        }
+      });
+
+      $stopPulseBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          stopPulsate();
+        }
+      });
+
+      // Keyboard shortcuts
+      $(document).on("keydown", function (e) {
+        if (e.target.tagName === "INPUT") return; // Ignore if typing in input
+        switch (e.key.toLowerCase()) {
+          case "f":
+            fadeToggle();
+            break;
+          case "i":
+            fadeIn();
+            break;
+          case "o":
+            fadeOut();
+            break;
+          case "p":
+            if (pulsateInterval) {
+              stopPulsate();
+            } else {
+              startPulsate();
+            }
+            break;
+        }
+      });
+
+      // Init states
+      updateButtons(false);
+    });
+  </script>
+</body>
+
+</html>

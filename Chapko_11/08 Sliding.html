@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Using slide to show and reveal elements</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    div#theDiv {
+      width: 250px;
+      height: 180px;
+      margin: 10px 0;
+      padding: 20px;
+      background: #b3c8d0;
+      border: 1px solid gray;
+      cursor: default;
+      font-size: 16pt;
+      color: #222;
+      box-sizing: border-box;
+      position: relative;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    div#theDiv.hidden {
+      box-shadow: none;
+    }
+
+    /* Badge overlay showing status inside theDiv */
+    #visibilityBadge {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background-color: #339af0;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+      user-select: none;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+
+    p,
+    span {
+      font-size: 16pt;
+    }
+
+    button {
+      margin: 5pt 8pt 0 0;
+      padding: 8px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid #999;
+      background-color: #f0f0f0;
+      transition: background-color 0.3s ease;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      border-color: #aaa;
+    }
+
+    button:hover:not(:disabled),
+    button:focus:not(:disabled) {
+      background-color: #d0e0ff;
+      outline: 2px solid #339af0;
+      outline-offset: 2px;
+    }
+
+    label {
+      font-size: 16pt;
+      margin-right: 10px;
+    }
+
+    select {
+      font-size: 16px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: 1px solid #999;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    select:focus {
+      outline: 2px solid #339af0;
+      outline-offset: 2px;
+    }
+
+    #statusMsg {
+      margin-top: 15px;
+      font-style: italic;
+      color: #555;
+      min-height: 1.5em;
+    }
+
+    @media (max-width: 600px) {
+      div#theDiv {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+        margin: 5pt 0 0 0;
+      }
+
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Using the slide functions</h1>
+  <section id="content">
+
+    <p>Elements can be shown or hidden with sliding animations using jQuery's slide functions. This is useful for
+      dismissible messages or toggled content.</p>
+    <ul>
+      <li><code>slideUp()</code>: hides the element by animating its height to 0 and then sets display to 'none'</li>
+      <li><code>slideDown()</code>: reveals the element by animating its height to its original value</li>
+      <li><code>slideToggle()</code>: toggles between slideUp and slideDown depending on current visibility</li>
+    </ul>
+
+    <div id="theDiv" aria-live="polite" aria-atomic="true" tabindex="0">
+      This is the sliding content box. Click the buttons below to slide it up or down.
+      <div id="visibilityBadge" aria-hidden="true">Visible</div>
+    </div>
+
+    <nav role="region" aria-label="Slide control buttons" style="margin-top: 15px;">
+      <button id="slideup" type="button" aria-pressed="false" title="Slide content up to hide it">Slide Up</button>
+      <button id="slidedown" type="button" aria-pressed="false" title="Slide content down to show it" disabled>Slide Down</button>
+      <button id="toggle" type="button" aria-pressed="false" title="Toggle content visibility">Toggle Slide</button>
+      <button id="reset" type="button" title="Reset content to visible state">Reset</button>
+      <label for="speedSelect">Speed:</label>
+      <select id="speedSelect" aria-label="Animation speed">
+        <option value="slow">Slow</option>
+        <option value="normal" selected>Normal</option>
+        <option value="fast">Fast</option>
+      </select>
+    </nav>
+
+    <div id="statusMsg" aria-live="polite" aria-atomic="true"></div>
+
+  </section>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    $(function () {
+      const $theDiv = $("#theDiv");
+      const $badge = $("#visibilityBadge");
+      const $slideUpBtn = $("#slideup");
+      const $slideDownBtn = $("#slidedown");
+      const $toggleBtn = $("#toggle");
+      const $resetBtn = $("#reset");
+      const $speedSelect = $("#speedSelect");
+      const $statusMsg = $("#statusMsg");
+
+      function updateButtons(isVisible) {
+        $slideUpBtn.prop("disabled", !isVisible).attr("aria-pressed", !isVisible ? "true" : "false");
+        $slideDownBtn.prop("disabled", isVisible).attr("aria-pressed", isVisible ? "true" : "false");
+        $toggleBtn.attr("aria-pressed", isVisible ? "true" : "false");
+        $resetBtn.prop("disabled", !isVisible);
+        $badge.text(isVisible ? "Visible" : "Hidden");
+        $theDiv.toggleClass("hidden", !isVisible);
+        $theDiv.attr("aria-hidden", !isVisible);
+        // Add subtle shadow only when visible
+        if (isVisible) {
+          $theDiv.css("box-shadow", "0 0 8px rgba(0,0,0,0.1)");
+        } else {
+          $theDiv.css("box-shadow", "none");
+        }
+      }
+
+      function updateStatus(message) {
+        $statusMsg.text(message);
+      }
+
+      function getSpeed() {
+        return $speedSelect.val();
+      }
+
+      // Disable buttons while animating
+      function setButtonsDisabled(state) {
+        $slideUpBtn.prop("disabled", state);
+        $slideDownBtn.prop("disabled", state);
+        $toggleBtn.prop("disabled", state);
+        $resetBtn.prop("disabled", state);
+        $speedSelect.prop("disabled", state);
+      }
+
+      // Animate background color smoothly
+      function animateBackgroundColor(toColor, duration = 300) {
+        $theDiv.stop(true, true).animate({ backgroundColor: toColor }, duration);
+      }
+
+      // Initial states
+      updateButtons(true);
+      updateStatus(`Content is visible. Speed set to "${getSpeed()}".`);
+      animateBackgroundColor("#b3c8d0");
+
+      // Slide up handler
+      $slideUpBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          setButtonsDisabled(true);
+          $theDiv.slideUp(getSpeed(), function () {
+            updateButtons(false);
+            updateStatus(`Content hidden with slideUp at speed "${getSpeed()}".`);
+            animateBackgroundColor("#d3d3d3");
+            setButtonsDisabled(false);
+          });
+        }
+      });
+
+      // Slide down handler
+      $slideDownBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          setButtonsDisabled(true);
+          $theDiv.slideDown(getSpeed(), function () {
+            updateButtons(true);
+            updateStatus(`Content revealed with slideDown at speed "${getSpeed()}".`);
+            animateBackgroundColor("#b3c8d0");
+            setButtonsDisabled(false);
+          });
+        }
+      });
+
+      // Toggle slide handler
+      $toggleBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          setButtonsDisabled(true);
+          $theDiv.slideToggle(getSpeed(), function () {
+            const visible = $theDiv.is(":visible");
+            updateButtons(visible);
+            updateStatus(`Content toggled ${visible ? "shown" : "hidden"} with speed "${getSpeed()}".`);
+            animateBackgroundColor(visible ? "#b3c8d0" : "#d3d3d3");
+            console.log("slideToggle complete on:", this.id || "theDiv");
+            setButtonsDisabled(false);
+          });
+        }
+      });
+
+      // Reset button: shows content and resets everything
+      $resetBtn.on("click keypress", function (e) {
+        if (e.type === "click" || e.key === "Enter" || e.key === " ") {
+          setButtonsDisabled(true);
+          $theDiv.stop(true, true).slideDown("fast", function () {
+            updateButtons(true);
+            updateStatus(`Content reset to visible. Speed is "${getSpeed()}".`);
+            animateBackgroundColor("#b3c8d0");
+            setButtonsDisabled(false);
+          });
+        }
+      });
+
+      // Speed change updates status immediately
+      $speedSelect.on("change", function () {
+        updateStatus(`Animation speed changed to "${getSpeed()}".`);
+      });
+    });
+  </script>
+</body>
+
+</html>
