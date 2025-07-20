@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smart Code Editor</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- p5.js -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/esprima@4.0.1/dist/esprima.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar" role="navigation" aria-label="Main Navigation">
+            <h1><span class="highlight">Smart</span> Code Editor</h1>
+            <ul class="nav-links">
+                <li><a href="editor.html" class="active">Editor</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="help.html">Help</a></li>
+                <li><button id="darkToggle" aria-pressed="false" title="Toggle dark mode">🌙</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="editor-container">
+        <section class="editor-panel glass" role="region" aria-label="Code editor and controls">
+            <h2>💻 Code Playground</h2>
+
+            <label for="categorySelect">Category:</label>
+            <select id="categorySelect" aria-label="Select project category">
+                <option value="" selected>-- Select Category --</option>
+            </select>
+
+            <label for="projectSelect">Project:</label>
+            <select id="projectSelect" aria-label="Select project">
+                <option value="" selected>-- Select Project --</option>
+            </select>
+
+            <textarea id="codeArea" placeholder="// Start coding here..."></textarea>
+            <button id="runCodeBtn" aria-label="Run code">▶ Run Code</button>
+        </section>
+
+        <select id="languageSelect">
+            <option value="js">JavaScript</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+        </select>
+        <div class="right-panel">
+            <aside class="ai-feedback glass" role="complementary" aria-live="polite" aria-atomic="true">
+                <h3>🧠 AI Debugger</h3>
+                <p id="feedback">Select a category and project to load code, or start typing to receive feedback...</p>
+            </aside>
+
+            <div class="output-container glass">
+                <h3 style="margin-bottom: 12px; color: #ffffff; font-weight: 600;">▶ Output</h3>
+                <iframe id="outputFrame" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Anna Chapko</p>
+        <p>Fonts: JetBrains Mono, Inter • Libraries: jQuery, p5.js</p>
+    </footer>
+
+    <script>
+        function runDebugger() {
+  const code = document.getElementById("codeArea").value;
+  const output = document.getElementById("feedback");
+
+  const errorResult = checkCodeForErrors(code);
+  const spellingResult = detectSpellingErrors(code);
+
+  let messages = [];
+  let severityColor = "lightgreen";
+
+  if (errorResult.type !== "none") {
+    messages.push(errorResult.message);
+    severityColor = errorResult.type === "error" ? "red" : "orange";
+  }
+
+  if (spellingResult.type !== "none") {
+    messages.push(spellingResult.message);
+    if (spellingResult.type === "warn" && severityColor !== "red") {
+      severityColor = "orange";
+    }
+  }
+
+  output.textContent = messages.length ? messages.join("\n") : "✅ All good!";
+  output.style.color = severityColor;
+}
+
+const dictionary = new Set([
+  "let", "const", "var", "function", "if", "else", "return", "for", "while",
+  "switch", "case", "break", "continue", "document", "window", "getElementById",
+  "querySelector", "canvas", "width", "height", "style", "true", "false",
+  "createElement", "appendChild", "getContext", "fillRect", "clearRect", "Math",
+  "canvasContainer", "style", "px", "code", "output", "value", "textContent",
+  "message", "type", "runDebugger", "checkCodeForErrors", "detectSpellingErrors"
+]);
+
+  function detectSpellingErrors(code) {
+  const lines = code.split("\n");
+  const unrecognizedWords = new Set();
+
+  for (let line of lines) {
+    // Remove comments and string literals (single, double, backtick)
+    let cleanLine = line.replace(/\/\/.*|".*?"|'.*?'|`.*?`/g, "");
+
+    // Extract variable/function/word-like tokens
+    const words = cleanLine.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g);
+    if (words) {
+      for (let word of words) {
+        if (!dictionary.has(word)) {
+          unrecognizedWords.add(word);
+        }
+      }
+    }
+  }
+
+  if (unrecognizedWords.size > 0) {
+    return {
+      type: "warn",
+      message:
+        "📝 Spelling Warning: Unrecognized word(s) → " +
+        [...unrecognizedWords].join(", "),
+    };
+  }
+
+  return { type: "none", message: "✅ No spelling issues detected." };
+}
+
+
+    function checkCodeForErrors(code) {
+  // 1. HTML check as before
+  if (/<[a-z]+/i.test(code)) {
+    const tagMismatch = code.match(/<[^>]*$/m);
+    if (tagMismatch) {
+      return { type: "error", message: "❌ HTML Error: Missing closing '>' near: " + tagMismatch[0] };
+    }
+
+    const selfClosingTags = new Set([
+      "area", "base", "br", "col", "embed", "hr", "img", "input",
+      "link", "meta", "param", "source", "track", "wbr"
+    ]);
+
+    const tagStack = [];
+    const tagRegex = /<\/?([a-zA-Z0-9\-]+)[^>]*>/g;
+    let match;
+    while ((match = tagRegex.exec(code)) !== null) {
+      const fullTag = match[0];
+      const tag = match[1].toLowerCase();
+      const isClosingTag = fullTag.startsWith("</");
+      const isSelfClosingTag = fullTag.endsWith("/>") || selfClosingTags.has(tag);
+
+      if (isClosingTag) {
+        if (tagStack.length === 0) {
+          return { type: "error", message: `❌ HTML Error: Unexpected closing </${tag}>` };
+        }
+        const lastTag = tagStack[tagStack.length - 1];
+        if (lastTag === tag) {
+          tagStack.pop();
+        } else {
+          return { type: "error", message: `❌ HTML Error: Unexpected closing </${tag}>, expected </${lastTag}>` };
+        }
+      } else if (!isSelfClosingTag) {
+        // Opening tag and not self-closing
+        tagStack.push(tag);
+      }
+    }
+
+    if (tagStack.length > 0) {
+      return { type: "error", message: `❌ HTML Error: Unclosed tag <${tagStack[tagStack.length - 1]}>` };
+    }
+  }
+
+  // 2. JavaScript syntax check
+  try {
+    esprima.parseScript(code);
+  } catch (e) {
+    return { type: "error", message: "❌ JS Syntax Error: " + e.message };
+  }
+
+  // 3. JS semicolon warning — check line by line
+  const lines = code.split('\n');
+  let inTemplate = false;
+
+  for (let line of lines) {
+    // Toggle inTemplate if backtick found (could be start or end)
+    const backtickCount = (line.match(/`/g) || []).length;
+    if (backtickCount % 2 !== 0) {
+      inTemplate = !inTemplate;
+      // Continue to next line to avoid false positives inside template strings
+      continue;
+    }
+
+    if (inTemplate) continue; // skip lines inside template literals
+
+    // Remove inline comments before checking
+    let codeLine = line.split("//")[0].trim();
+
+    if (
+      codeLine && // non-empty after removing comments
+      !codeLine.endsWith(";") &&
+      !codeLine.endsWith("{") &&
+      !codeLine.endsWith("}") &&
+      !codeLine.startsWith("if") &&
+      !codeLine.startsWith("for") &&
+      !codeLine.startsWith("while") &&
+      !codeLine.startsWith("switch") &&
+      !codeLine.startsWith("case") &&
+      !codeLine.includes("function")
+    ) {
+      return { type: "warn", message: "⚠️ JS Warning: Possible missing semicolon near: " + line.trim() };
+    }
+  }
+
+  // If no errors or warnings found
+  return { type: "none", message: "✅ No syntax errors detected." };
+}
+
+
+        const categorySelect = document.getElementById("categorySelect");
+        const projectSelect = document.getElementById("projectSelect");
+        const codeArea = document.getElementById("codeArea");
+        const feedback = document.getElementById("feedback");
+        const darkToggle = document.getElementById("darkToggle");
+
+        const projectsByCategory = {
+            "Algorithms": ["Sorting Visualizer", "FizzBuzz", "Palindrome Checker", "Debounce Function"],
+            "Utilities": ["Calculator", "Currency Converter", "LocalStorage Example", "Basic Form Validation", "Debounce Function", "Theme Switcher", "Responsive Nav"],
+            "Games & Interaction": ["To-Do App", "Quiz Game", "Chat Bot"],
+            "API & Data": ["Weather Dashboard", "Fetch Users", "Random Quote"],
+            "UI Components": ["Image Slider", "Simple Slider"],
+        };
+
+        const projectExamples = {
+            "Sorting Visualizer": `// Selection sort visualization with p5.js
+// Interactive: No user input, visual animation only.
+
+let values = [];
+let i = 0;
+let minIndex = 0;
+
+function setup() {
+  createCanvas(600, 300);
+  values = Array.from({ length: 50 }, () => random(height));
+  frameRate(30);
+}
+
+function draw() {
+  background(30);
+
+  if (i < values.length - 1) {
+    minIndex = i;
+    for (let k = i + 1; k < values.length; k++) {
+      if (values[k] < values[minIndex]) {
+        minIndex = k;
+      }
+    }
+    // Swap after highlighting min
+    [values[i], values[minIndex]] = [values[minIndex], values[i]];
+    i++;
+  } else {
+    noLoop();
+    fill(255);
+    textSize(24);
+    textAlign(CENTER);
+    text("Sorting Complete!", width / 2, height / 2);
+  }
+
+  for (let k = 0; k < values.length; k++) {
+    noStroke();
+    if (k === i) fill(0, 255, 0);
+    else if (k === minIndex) fill(255, 0, 0);
+    else fill(100, 100, 255);
+    rect(k * (width / values.length), height - values[k], width / values.length, values[k]);
+  }
+}
+`,
+
+            "FizzBuzz": `// Interactive FizzBuzz with prompt to enter a number
+
+const n = parseInt(prompt("Enter a number to run FizzBuzz up to:"));
+if (isNaN(n) || n < 1) {
+  alert("Please enter a valid positive number.");
+} else {
+  for (let i = 1; i <= n; i++) {
+    let output = "";
+    if (i % 3 === 0) output += "Fizz";
+    if (i % 5 === 0) output += "Buzz";
+    console.log(output || i);
+  }
+  alert("Check console for FizzBuzz results!");
+}
+`,
+
+            "Palindrome Checker": `// Ask user for string input and check if it's a palindrome
+
+const userInput = prompt("Enter a word or phrase to check if it's a palindrome:");
+if (userInput) {
+  const clean = userInput.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const isPal = clean === clean.split("").reverse().join("");
+  alert(\`"\${userInput}" is \${isPal ? "" : "not "}a palindrome.\`);
+} else {
+  alert("No input provided.");
+}
+`,
+
+            "Calculator": `// Simple interactive calculator in prompt
+
+const a = parseFloat(prompt("Enter the first number:"));
+const b = parseFloat(prompt("Enter the second number:"));
+const op = prompt("Enter operation (+, -, *, /):");
+
+if (isNaN(a) || isNaN(b)) {
+  alert("Invalid numbers entered.");
+} else {
+  let result;
+  switch(op) {
+    case "+": result = a + b; break;
+    case "-": result = a - b; break;
+    case "*": result = a * b; break;
+    case "/":
+      if (b === 0) alert("Error: division by zero.");
+      else result = a / b;
+      break;
+    default:
+      alert("Invalid operation.");
+  }
+  if (result !== undefined) alert(\`Result: \${result}\`);
+}
+`,
+
+            "Quiz Game": `// Interactive quiz with prompts, tracks score
+
+const questions = [
+  { q: "What is the capital of Spain?", a: "Madrid" },
+  { q: "What is 5 * 6?", a: "30" }
+];
+
+let score = 0;
+
+for (let i = 0; i < questions.length; i++) {
+  const answer = prompt(questions[i].q);
+  if (answer && answer.toLowerCase() === questions[i].a.toLowerCase()) {
+    alert("Correct!");
+    score++;
+  } else {
+    alert(\`Wrong! Correct answer: \${questions[i].a}\`);
+  }
+}
+
+alert(\`Quiz over! Your score: \${score} / \${questions.length}\`);
+`,
+
+            "Chat Bot": `// Chatbot interaction using prompt loop
+
+function chatBot() {
+  let input;
+  alert("Chatbot started. Type 'bye' to exit.");
+  do {
+    input = prompt("You:");
+    if (!input) break;
+    input = input.toLowerCase();
+    if (input.includes("hello") || input.includes("hi")) {
+      alert("Bot: Hello! How can I help?");
+    } else if (input.includes("help")) {
+      alert("Bot: You can ask me anything or say 'bye' to quit.");
+    } else if (input === "bye") {
+      alert("Bot: Goodbye! Have a great day!");
+      break;
+    } else {
+      alert("Bot: Sorry, I didn't get that.");
+    }
+  } while (input !== "bye");
+}
+
+chatBot();
+`,
+
+            "To-Do App": `// Simple to-do list asking for tasks via prompt
+
+let tasks = [];
+
+function addTask() {
+  const task = prompt("Enter a task to add (or leave blank to stop):");
+  if (task) {
+    tasks.push(task);
+    alert(\`Added: "\${task}"\`);
+    addTask();
+  } else {
+    alert("Task entry finished.");
+    listTasks();
+  }
+}
+
+function listTasks() {
+  if (tasks.length === 0) {
+    alert("No tasks to show.");
+  } else {
+    alert("Tasks:\\n" + tasks.map((t, i) => \`\${i + 1}. \${t}\`).join("\\n"));
+  }
+}
+
+addTask();
+`,
+
+            "Random Quote": `// Show random quote with button prompt
+
+const quotes = [
+  "Keep going, you're doing great!",
+  "Believe in yourself.",
+  "Success is a journey, not a destination.",
+  "Mistakes are proof that you're trying.",
+  "Stay positive, work hard, make it happen."
+];
+
+function showQuote() {
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  alert("Quote of the day: " + quote);
+}
+
+showQuote();
+`,
+
+            "Fetch Users": `// Fetch users and ask user if they want to see details
+
+fetch("https://jsonplaceholder.typicode.com/users")
+  .then(res => res.json())
+  .then(users => {
+    const names = users.map(u => u.name).join(", ");
+    if (confirm("Users fetched: " + names + ". See details?")) {
+      users.forEach(u => alert(\`\${u.name} - \${u.email}\`));
+    }
+  })
+  .catch(e => alert("Error fetching users: " + e.message));
+`,
+
+            "Drawing Canvas": `
+// Interactive drawing with color and brush size controls
+
+let brushColor = '#00aaff';
+let brushSize = 5;
+
+document.body.innerHTML = \`
+  <h2>Drawing Canvas</h2>
+  <div style="margin-bottom: 8px;">
+    Color: <input type="color" id="colorPicker" value="\${brushColor}" />
+    Brush size: <input type="range" id="sizeSlider" min="1" max="30" value="\${brushSize}" />
+    <button id="clearBtn">Clear Canvas</button>
+  </div>
+  <div id="canvasContainer"></div>
+\`;
+
+const canvasContainer = document.getElementById('canvasContainer');
+canvasContainer.style.width = '1000px';  // match canvas width
+canvasContainer.style.height = '600px';  // match canvas height
+canvasContainer.style.overflow = 'hidden';  // no scrollbars
+canvasContainer.style.border = '1px solid #333';
+canvasContainer.style.margin = '0 auto';
+canvasContainer.style.boxSizing = 'border-box';
+
+const canvas = document.createElement('canvas');
+canvas.width = 1000;
+canvas.height = 600;
+canvas.style.border = 'none';  // container has the border
+canvasContainer.appendChild(canvas);
+
+const ctx = canvas.getContext('2d');
+ctx.lineCap = 'round';
+
+let drawing = false;
+
+canvas.addEventListener('mousedown', () => drawing = true);
+canvas.addEventListener('mouseup', () => {
+  drawing = false;
+  ctx.beginPath();
+});
+canvas.addEventListener('mouseout', () => {
+  drawing = false;
+  ctx.beginPath();
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (!drawing) return;
+  ctx.strokeStyle = colorPicker.value;
+  ctx.lineWidth = sizeSlider.value;
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
+});
+
+clearBtn.onclick = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+};
+`,
+
+            "Image Slider": `
+// Image slider with next/prev buttons and smooth fade animation
+const images = [
+  "https://picsum.photos/id/1015/600/300",
+  "https://picsum.photos/id/1016/600/300",
+  "https://picsum.photos/id/1020/600/300"
+];
+
+let index = 0;
+
+document.body.innerHTML = \`
+  <h2>Image Slider</h2>
+  <div style="position: relative; width: 600px; height: 300px; overflow: hidden;">
+    <img id="sliderImg" src="\${images[index]}" style="width: 100%; height: 100%; object-fit: cover; opacity: 1; transition: opacity 0.5s;" />
+  </div>
+  <button id="prevBtn" style="margin-right: 10px;">Prev</button>
+  <button id="nextBtn">Next</button>
+\`;
+
+const sliderImg = document.getElementById('sliderImg');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function showImage(newIndex) {
+  sliderImg.style.opacity = 0;
+  setTimeout(() => {
+    index = newIndex;
+    sliderImg.src = images[index];
+    sliderImg.style.opacity = 1;
+  }, 500);
+}
+
+prevBtn.onclick = () => {
+  showImage((index - 1 + images.length) % images.length);
+};
+nextBtn.onclick = () => {
+  showImage((index + 1) % images.length);
+};
+`,
+
+            "Currency Converter": `
+// Real-time USD to EUR, GBP, JPY converter with input validation
+
+const rates = { EUR: 0.9, GBP: 0.78, JPY: 140 };
+
+document.body.innerHTML = \`
+  <h2>Currency Converter</h2>
+  <input type="number" id="usdInput" placeholder="Amount in USD" min="0" step="any" />
+  <select id="currencySelect">
+    <option value="EUR">Euro (EUR)</option>
+    <option value="GBP">British Pound (GBP)</option>
+    <option value="JPY">Japanese Yen (JPY)</option>
+  </select>
+  <div id="result" style="margin-top: 10px; font-weight: bold;"></div>
+\`;
+
+const usdInput = document.getElementById('usdInput');
+const currencySelect = document.getElementById('currencySelect');
+const result = document.getElementById('result');
+
+function convert() {
+  const usd = parseFloat(usdInput.value);
+  const target = currencySelect.value;
+  if (isNaN(usd) || usd < 0) {
+    result.textContent = "Enter a valid USD amount.";
+    return;
+  }
+  const converted = (usd * rates[target]).toFixed(2);
+  result.textContent = \`\${usd} USD = \${converted} \${target}\`;
+}
+
+usdInput.addEventListener('input', convert);
+currencySelect.addEventListener('change', convert);
+`,
+
+            "Debounce Function": `
+// Demonstrate debounce by showing debounced typing output
+
+function debounce(fn, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+document.body.innerHTML = \`
+  <h2>Debounce Demo</h2>
+  <input type="text" id="debounceInput" placeholder="Type something..." />
+  <p>Debounced output: <span id="output"></span></p>
+\`;
+
+const input = document.getElementById('debounceInput');
+const output = document.getElementById('output');
+
+const debounced = debounce(() => {
+  output.textContent = input.value;
+}, 800);
+
+input.addEventListener('input', debounced);
+`,
+
+            "Theme Switcher": `
+// Theme toggler with button and persistent choice via localStorage
+
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.body.className = savedTheme;
+
+document.body.innerHTML = \`
+  <h2>Theme Switcher</h2>
+  <button id="toggleBtn">Toggle Theme</button>
+  <p>Current theme: <span id="themeName">\${savedTheme}</span></p>
+\`;
+
+const toggleBtn = document.getElementById('toggleBtn');
+const themeName = document.getElementById('themeName');
+
+toggleBtn.onclick = () => {
+  const newTheme = document.body.className === 'light' ? 'dark' : 'light';
+  document.body.className = newTheme;
+  localStorage.setItem('theme', newTheme);
+  themeName.textContent = newTheme;
+};
+
+// Add basic dark/light styles dynamically
+const style = document.createElement('style');
+style.textContent = \`
+  body.light { background: white; color: black; }
+  body.dark { background: #121212; color: #e0e0e0; }
+  button { padding: 0.5rem 1rem; margin-top: 1rem; }
+\`;
+document.head.appendChild(style);
+`,
+
+            "Responsive Nav": `
+// Responsive nav with toggle menu button
+
+document.body.innerHTML = \`
+  <h2>Responsive Navigation</h2>
+  <nav style="border: 1px solid #ccc; padding: 10px; max-width: 300px;">
+    <button id="menuToggle" aria-expanded="false">☰ Menu</button>
+    <ul id="navMenu" style="list-style:none; padding-left: 0; display:none; margin-top: 10px;">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+\`;
+
+const menuToggle = document.getElementById('menuToggle');
+const navMenu = document.getElementById('navMenu');
+
+menuToggle.onclick = () => {
+  const isVisible = navMenu.style.display === 'block';
+  navMenu.style.display = isVisible ? 'none' : 'block';
+  menuToggle.setAttribute('aria-expanded', !isVisible);
+};
+`,
+
+            "Simple Slider": `
+// Interactive slider with animated label and color feedback
+
+document.body.innerHTML = \`
+  <style>
+    .slider-container {
+      width: 300px;
+      margin: 60px auto;
+      text-align: center;
+      font-family: sans-serif;
+    }
+
+    .slider-wrapper {
+      position: relative;
+      height: 60px;
+      margin-top: 20px;
+    }
+
+    #slider {
+      width: 100%;
+      appearance: none;
+      height: 6px;
+      border-radius: 4px;
+      background: #ccc;
+      outline: none;
+    }
+
+    #sliderValue {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #222;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+    }
+  </style>
+
+  <div class="slider-container">
+    <h2>Simple Slider</h2>
+    <div class="slider-wrapper">
+      <span id="sliderValue">50</span>
+      <input type="range" id="slider" min="0" max="100" value="50" />
+    </div>
+  </div>
+\`;
+
+const slider = document.getElementById('slider');
+const sliderValue = document.getElementById('sliderValue');
+
+function updateSlider() {
+  const value = parseInt(slider.value, 10);
+  sliderValue.textContent = value;
+
+  // Calculate slider thumb position
+  const percent = (value - slider.min) / (slider.max - slider.min);
+  const sliderWidth = slider.offsetWidth;
+  const offset = percent * sliderWidth;
+
+  // Update label position and color
+  sliderValue.style.left = \`\${offset}px\`;
+
+  const red = Math.round((value / 100) * 255);
+  const green = 255 - red;
+  sliderValue.style.backgroundColor = \`rgb(\${red}, \${green}, 100)\`;
+}
+
+slider.addEventListener('input', updateSlider);
+window.addEventListener('load', updateSlider);
+`,
+
+            "LocalStorage Example": `
+// Save and retrieve user name using localStorage with UI
+
+document.body.innerHTML = \`
+  <h2>LocalStorage Example</h2>
+  <input type="text" id="nameInput" placeholder="Enter your name" />
+  <button id="saveBtn">Save Name</button>
+  <p id="greeting"></p>
+\`;
+
+const nameInput = document.getElementById('nameInput');
+const saveBtn = document.getElementById('saveBtn');
+const greeting = document.getElementById('greeting');
+
+function updateGreeting() {
+  const name = localStorage.getItem('userName');
+  greeting.textContent = name ? \`Hello, \${name}!\` : '';
+}
+
+saveBtn.onclick = () => {
+  const name = nameInput.value.trim();
+  if (name) {
+    localStorage.setItem('userName', name);
+    updateGreeting();
+  } else {
+    alert("Please enter a name.");
+  }
+};
+
+updateGreeting();
+`,
+
+            "Basic Form Validation": `
+// Basic form validation on submit
+
+document.body.innerHTML = \`
+  <h2>Basic Form Validation</h2>
+  <form id="form" novalidate>
+    <label for="email">Email: </label>
+    <input type="email" id="email" required />
+    <button type="submit">Submit</button>
+  </form>
+  <p id="msg" style="color:red;"></p>
+\`;
+
+const form = document.getElementById('form');
+const emailInput = document.getElementById('email');
+const msg = document.getElementById('msg');
+
+form.onsubmit = e => {
+  e.preventDefault();
+  if (!emailInput.validity.valid) {
+    msg.textContent = "Please enter a valid email.";
+  } else {
+    msg.textContent = "Form submitted successfully!";
+  }
+};
+`,
+        };
+
+
+        // Functions for dropdown population and code loading
+
+        function populateCategories() {
+            categorySelect.innerHTML = '<option value="" selected>-- Select Category --</option>';
+            Object.keys(projectsByCategory).forEach(cat => {
+                const option = document.createElement("option");
+                option.value = cat;
+                option.textContent = cat;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        function populateProjects(category) {
+            projectSelect.innerHTML = '<option value="" selected>-- Select Project --</option>';
+            if (!category) return;
+            const projects = projectsByCategory[category] || [];
+            projects.forEach(proj => {
+                const option = document.createElement("option");
+                option.value = proj;
+                option.textContent = proj;
+                projectSelect.appendChild(option);
+            });
+        }
+
+        function loadProjectCode(project) {
+            if (project && projectExamples[project]) {
+                codeArea.value = projectExamples[project];
+                feedback.textContent = `Loaded project: ${project}`;
+            } else {
+                codeArea.value = "";
+                feedback.textContent = "Select a project to load code.";
+            }
+        }
+
+        // Event listeners and initialization
+
+        window.onload = () => {
+            populateCategories();
+
+            categorySelect.addEventListener("change", () => {
+                const cat = categorySelect.value;
+                populateProjects(cat);
+                codeArea.value = "";
+                feedback.textContent = "Select a project to load code.";
+            });
+
+            projectSelect.addEventListener("change", () => {
+                const proj = projectSelect.value;
+                loadProjectCode(proj);
+            });
+
+            darkToggle.addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+                const pressed = darkToggle.getAttribute("aria-pressed") === "true";
+                darkToggle.setAttribute("aria-pressed", String(!pressed));
+                darkToggle.textContent = pressed ? "🌙" : "☀️";
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectFromUrl = urlParams.get("project");
+
+            if (projectFromUrl && projectExamples[projectFromUrl]) {
+                loadProjectCode(projectFromUrl);
+                const category = Object.keys(projectsByCategory).find(cat => projectsByCategory[cat].includes(projectFromUrl));
+                if (category) {
+                    categorySelect.value = category;
+                    populateProjects(category);
+                    projectSelect.value = projectFromUrl;
+                }
+            }
+
+            const languageSelect = document.getElementById("languageSelect");
+
+            codeArea.addEventListener("input", () => {
+                const code = codeArea.value;
+                const lang = languageSelect.value;
+                if (code.trim() === "") {
+                    feedback.textContent = "Start typing to receive feedback...";
+                    return;
+                }
+                let result;
+                if (lang === "js") {
+                    result = checkCodeForErrors(code);
+                } else if (lang === "html") {
+                    result = checkHtmlErrors(code);
+                } else if (lang === "css") {
+                    result = checkCssErrors(code);
+                }
+                feedback.textContent = result.message;
+            });
+            // ** Attach run button listener here! **
+            const runBtn = document.getElementById("runCodeBtn");
+            const outputFrame = document.getElementById("outputFrame");
+
+            runBtn.addEventListener("click", () => {
+                const userCode = codeArea.value;
+                const escapedCode = JSON.stringify(userCode);
+
+                const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Output</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #32fbe2;
+      font-family: 'JetBrains Mono', monospace;
+      margin: 0;
+      padding: 1rem;
+      overflow-wrap: break-word;
+    }
+    #output {
+  white-space: pre-wrap;
+  color: #32fbe2;
+  font-size: 1rem;
+  line-height: 1.4;
+  width: 200%;           /* <-- Add this line (change 90% to what you want) */
+  height: 900px;        /* <-- Add this line to control fixed height */
+  overflow-y: visible;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 8px #32fbe2aa;
+  user-select: text;
+}
+
+    .log-line {
+      margin-bottom: 6px;
+    }
+    .alert {
+      color: #ff6f61;
+      font-weight: 600;
+    }
+    .error {
+      color: #ff4d4d;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <pre id="output"></pre>
+  <script>
+    (function() {
+      const outputEl = document.getElementById('output');
+
+      function appendLine(text, className) {
+        const line = document.createElement('div');
+        line.textContent = text;
+        line.className = 'log-line ' + (className || '');
+        outputEl.appendChild(line);
+        outputEl.scrollTop = outputEl.scrollHeight;
+      }
+
+      console.log = function(...args) {
+        const text = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+        appendLine(text);
+      };
+
+      console.error = function(...args) {
+        const text = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+        appendLine('[Error] ' + text, 'error');
+      };
+
+      window.alert = function(message) {
+        appendLine('[Alert] ' + message, 'alert');
+      };
+
+      try {
+        const code = ${escapedCode};
+        const userFunc = new Function('console', 'alert', \`return (async () => { \${code} })()\`);
+        userFunc(console, alert).catch(e => {
+          appendLine('[Error] ' + e.message, 'error');
+        });
+      } catch (e) {
+        appendLine('[Error] ' + e.message, 'error');
+      }
+    })();
+  <\/script>
+</body>
+</html>
+`;
+
+                const iframeDoc = outputFrame.contentDocument || outputFrame.contentWindow.document;
+                iframeDoc.open();
+                iframeDoc.write(html);
+                iframeDoc.close();
+            });
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,205 @@
+:root {
+  --bg: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+  --panel-bg: rgba(255, 255, 255, 0.05);
+  --accent1: #32fbe2;
+  --accent2: #b388eb;
+  --accent3: #d4fe76;
+  --text: #222;
+  --text-dark: #fff;
+  --muted: #555;
+  --muted-dark: #aaa;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+background-color: #b388eb !important;
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s ease-in-out;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body.dark-mode {
+  background: var(--bg) !important;
+  color: var(--text-dark) !important;
+}
+
+body.dark-mode .editor-panel,
+body.dark-mode .ai-feedback,
+body.dark-mode .navbar,
+body.dark-mode footer,
+body.dark-mode .glass {
+  background: rgba(20, 20, 40, 0.85) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--accent1) !important;
+}
+
+body.dark-mode footer {
+  color: var(--muted-dark) !important;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: transparent;
+  border-bottom: 2px solid var(--accent1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  color: var(--text);
+}
+
+body.dark-mode .navbar {
+  background: rgba(20, 20, 40, 0.85) !important;
+}
+
+.navbar h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.highlight {
+  color: var(--accent1);
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+}
+
+.nav-links a,
+.dark-button {
+  text-decoration: none;
+  color: var(--accent3);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.nav-links a:hover,
+.dark-button:hover {
+  background-color: var(--panel-bg);
+  border-color: var(--accent2);
+}
+
+.active {
+  color: var(--accent1);
+  border-bottom: 2px solid var(--accent1);
+}
+
+.editor-container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2rem;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+}
+.glass {
+  background: var(--panel-bg);
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  transition: transform 0.3s ease;
+}
+.glass:hover {
+  transform: scale(1.02);
+}
+
+.editor-panel {
+  flex: 1.5;
+  min-width: 320px;
+}
+
+#codeArea {
+  width: 100%;
+  height: 300px;
+  background-color: #111827;
+  color: #32fbe2;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  padding: 1rem;
+  border: 2px solid var(--accent2);
+  border-radius: 12px;
+  resize: vertical;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+  margin-left: -18px; /* Add this line, adjust value as needed */
+}
+
+.ai-feedback {
+  flex: 1;
+  min-width: 280px;
+  border-left: 3px solid var(--accent1);
+}
+
+.loading-spinner {
+  border: 6px solid rgba(255, 255, 255, 0.1);
+  border-top: 6px solid var(--accent1);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 1rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: 0.9rem;
+  background: transparent;
+  border-top: 1px solid var(--accent1);
+  margin-top: 2rem;
+  color: var(--muted);
+}
+.editor-panel.glass,
+.ai-feedback.glass {
+  border: 2px solid #32fbe2;      /* bright cyan for testing */
+  border-top: 4px solid #32fbe2;
+  border-radius: 20px;
+  color: var(--text);
+}
+
+/* p5.js canvas enhancements */
+canvas {
+  display: block;
+  margin: 2rem auto;
+  border: 2px solid var(--accent1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  background-color: #fff;
+  max-width: 100%;
+}
+
+#runCodeBtn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#outputFrame {
+  width: 600;   /* match the canvas width you want */
+  height: 300px;   /* match the canvas height you want */
+  border: 2px solid #32fbe2;
+  border-radius: 8px;
+  background: #121212; /* dark bg to match output */
+  box-sizing: border-box;
+  overflow: hidden;  /* no scrollbars */
+}

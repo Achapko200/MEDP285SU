@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects – Smart Code Editor</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap"
+    rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="projects.css" />
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main Navigation">
+    <h1><span class="highlight">Smart</span> Code Editor</h1>
+    <ul class="nav-links">
+      <li><a href="editor.html">Editor</a></li>
+      <li><a class="active" href="projects.html">Projects</a></li>
+      <li><a href="help.html">Help</a></li>
+      <li><button id="darkToggle" title="Toggle dark mode" aria-pressed="false">🌙</button></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Image -->
+  <header class="hero" role="banner">
+    <img id="heroImage" alt="Person coding on laptop" loading="lazy" width="100%" height="300"
+      style="object-fit: cover;" />
+    <div class="hero-text">
+      <h2>📁 Your Projects</h2>
+      <p>Manage, view, edit, and delete saved code experiments.</p>
+    </div>
+  </header>
+
+  <!-- Category Filter -->
+  <section class="filter-section" style="padding: 1rem; max-width: 600px; margin: auto;">
+    <label for="categorySelect" style="font-weight: 600; margin-right: 0.5rem;">Filter by Category:</label>
+    <select id="categorySelect" aria-label="Select project category" style="padding: 0.3rem 0.5rem; font-size: 1rem;">
+      <option value="All" selected>All</option>
+      <option value="Algorithms">Algorithms</option>
+      <option value="Utilities">Utilities</option>
+      <option value="Games & Interaction">Games & Interaction</option>
+      <option value="Visualization & Animation">Visualization & Animation</option>
+      <option value="API & Data">API & Data</option>
+      <option value="UI Components">UI Components</option>
+      <option value="Timers & Clocks">Timers & Clocks</option>
+    </select>
+  </section>
+
+  <!-- Main Section -->
+  <main class="projects-container" style="max-width: 900px; margin: 1rem auto;">
+    <section class="projects-grid" aria-label="Projects list" style="display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1rem;">
+      <!-- Project cards inserted dynamically here -->
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="deleteModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalMessage"
+    style="position: fixed; top:0; left:0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 999;">
+    <div class="modal-content glass" style="background: white; padding: 1.5rem; border-radius: 8px; max-width: 400px; width: 90%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+      <p id="modalMessage" style="font-weight: 600; margin-bottom: 1rem;">Are you sure you want to delete this project?</p>
+      <div class="modal-buttons" style="text-align: right;">
+        <button id="confirmDelete" class="confirm" style="padding: 0.4rem 1rem; margin-right: 0.5rem; background: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer;">Yes</button>
+        <button id="cancelDelete" style="padding: 0.4rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 1rem; font-size: 0.9rem; color: #666;">
+    <p>© 2025 Anna Chapko</p>
+    <p>Fonts: JetBrains Mono, Inter • Libraries: jQuery, p5.js</p>
+  </footer>
+
+  <!-- Script -->
+  <script>
+    // Data: Projects by category
+    const projectsByCategory = {
+      "All": [
+        "Sorting Visualizer",
+        "Calculator",
+        "To-Do App",
+        "Drawing Canvas",
+        "Chat Bot",
+        "Quiz Game",
+        "Palindrome Checker",
+        "Image Slider",
+        "Currency Converter",
+        "FizzBuzz",
+        "Debounce Function",
+        "Theme Switcher",
+        "Responsive Nav",
+        "Simple Countdown",
+        "Fetch Users",
+        "Simple Slider",
+        "Random Quote",
+        "LocalStorage Example",
+        "Basic Form Validation",
+        "Simple Animation",
+      ],
+      "Algorithms": [
+        "Sorting Visualizer",
+        "FizzBuzz",
+        "Palindrome Checker",
+        "Debounce Function"
+      ],
+      "Utilities": [
+        "Calculator",
+        "Currency Converter",
+        "LocalStorage Example",
+        "Basic Form Validation",
+        "Debounce Function",
+        "Theme Switcher",
+        "Responsive Nav"
+      ],
+      "Games & Interaction": [
+        "To-Do App",
+        "Quiz Game",
+        "Chat Bot"
+      ],
+      "Visualization & Animation": [
+        "Drawing Canvas",
+        "Sorting Visualizer",
+        "Simple Animation",
+      ],
+      "API & Data": [
+        "Fetch Users",
+        "Random Quote"
+      ],
+      "UI Components": [
+        "Image Slider",
+        "Simple Slider"
+      ],
+      "Timers & Clocks": [
+        "Simple Countdown",
+      ]
+    };
+
+    // Project details: description and emoji icon
+    const allProjects = {
+      "Sorting Visualizer": { description: "Bubble sort animation built with p5.js", icon: "🌀" },
+      "Calculator": { description: "Basic calculator with JS logic", icon: "🧮" },
+      "To-Do App": { description: "Track your tasks with localStorage", icon: "✅" },
+      "Drawing Canvas": { description: "Simple paint app with p5.js", icon: "🎨" },
+      "Chat Bot": { description: "Basic chatbot simulation", icon: "🤖" },
+      "Quiz Game": { description: "Simple quiz game logic", icon: "❓" },
+      "Palindrome Checker": { description: "Check if a string is palindrome", icon: "🔄" },
+      "Image Slider": { description: "Basic image slider logic", icon: "🖼️" },
+      "Currency Converter": { description: "Convert currencies with fixed rates", icon: "💱" },
+      "FizzBuzz": { description: "Classic FizzBuzz algorithm", icon: "🧪" },
+      "Debounce Function": { description: "Debounce utility function", icon: "⏳" },
+      "Theme Switcher": { description: "Toggle dark/light theme", icon: "🌗" },
+      "Responsive Nav": { description: "Simple responsive nav toggle", icon: "📱" },
+      "Simple Countdown": { description: "Countdown timer to a date", icon: "⏳" },
+      "Fetch Users": { description: "Fetch and display users from API", icon: "👥" },
+      "Simple Slider": { description: "Slider with left-right arrows", icon: "🎞️" },
+      "Random Quote": { description: "Display a random quote", icon: "💬" },
+      "LocalStorage Example": { description: "Store and retrieve user data", icon: "💾" },
+      "Basic Form Validation": { description: "Check if form inputs are filled", icon: "✔️" },
+      "Simple Animation": { description: "Animate a circle across canvas", icon: "🎬" },
+    };
+
+    let selectedProject = "";
+
+    // Hero images array
+    const heroImages = [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1537432376769-00a59f08b1c4?auto=format&fit=crop&w=1600&q=80"
+    ];
+
+    function setRandomHeroImage() {
+      const imgElement = document.getElementById("heroImage");
+      const randomIndex = Math.floor(Math.random() * heroImages.length);
+      imgElement.src = heroImages[randomIndex];
+    }
+
+    // Render project cards based on selected category
+    function renderProjects(category) {
+      const container = $(".projects-grid");
+      container.empty();
+
+      const projects = category === "All" ? projectsByCategory["All"] : projectsByCategory[category] || [];
+      projects.forEach(projectName => {
+        const proj = allProjects[projectName];
+        if (!proj) return;
+
+        const projectCard = $(`
+          <article class="project-card glass" role="region" aria-labelledby="${projectName}-title" style="background: rgba(255 255 255 / 0.8); padding: 1rem; border-radius: 8px; box-shadow: 0 1px 5px rgb(0 0 0 / 0.1);">
+            <h3 id="${projectName}-title">${proj.icon} ${projectName}</h3>
+            <p>${proj.description}</p>
+            <button class="edit-btn" data-project="${projectName}" aria-label="Edit ${projectName} project" style="margin-right: 0.5rem; cursor:pointer;">✏️ Edit</button>
+            <button class="delete-btn" data-project="${projectName}" aria-label="Delete ${projectName} project" style="cursor:pointer;">🗑 Delete</button>
+          </article>
+        `);
+        container.append(projectCard);
+      });
+
+      // Rebind buttons
+      $(".delete-btn").off("click").on("click", function () {
+        selectedProject = $(this).data("project");
+        $("#modalMessage").text(`Delete "${selectedProject}"?`);
+        $("#deleteModal").removeClass("hidden").addClass("show");
+      });
+
+      $(".edit-btn").off("click").on("click", function () {
+        const projectName = $(this).data("project");
+        window.location.href = `editor.html?project=${encodeURIComponent(projectName)}`;
+      });
+    }
+
+    // On page load
+    window.onload = () => {
+      setRandomHeroImage();
+      renderProjects("All");
+
+      // Dark Mode Toggle
+      $("#darkToggle").click(() => {
+        $("body").toggleClass("dark-mode");
+        const pressed = $("#darkToggle").attr("aria-pressed") === "true";
+        $("#darkToggle").attr("aria-pressed", !pressed);
+      });
+
+      // Category filter change event
+      $("#categorySelect").on("change", function () {
+        renderProjects(this.value);
+      });
+
+      // Modal Delete Buttons
+      $("#confirmDelete").click(() => {
+        $(`.delete-btn[data-project="${selectedProject}"]`).closest(".project-card").remove();
+        $("#deleteModal").addClass("hidden").removeClass("show");
+      });
+      $("#cancelDelete").click(() => {
+        $("#deleteModal").addClass("hidden").removeClass("show");
+      });
+    };
+  </script>
+</body>
+
+</html>

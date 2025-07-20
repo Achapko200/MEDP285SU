@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Help – Smart Code Editor</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap"
+    rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- jQuery (Dark Mode) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main Navigation">
+    <h1><span class="highlight">Smart</span> Code Editor</h1>
+    <ul class="nav-links">
+      <li><a href="editor.html">Editor</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a class="active" href="help.html">Help</a></li>
+      <li><button id="darkToggle" title="Toggle dark mode" aria-pressed="false">🌙</button></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="help-container glass" role="main">
+    <h2>🆘 Help & FAQs</h2>
+
+    <section class="faq">
+      <h3>How do I create a new project?</h3>
+      <p>Navigate to the <a href="editor.html">Editor</a> page and start typing your code in the playground. Your code will be saved automatically.</p>
+
+      <h3>How do I edit an existing project?</h3>
+      <p>Go to the <a href="projects.html">Projects</a> page, find your project, and click the ✏️ Edit button. This will open the code in the editor for editing.</p>
+
+      <h3>Can I delete a project?</h3>
+      <p>Yes! On the <a href="projects.html">Projects</a> page, click the 🗑 Delete button on the project you want to remove. You will be asked to confirm before deletion.</p>
+
+      <h3>What is the AI Debugger?</h3>
+      <p>The AI Debugger analyzes your code in real-time and gives helpful tips or suggestions to improve your code as you type.</p>
+
+      <h3>How do I toggle dark mode?</h3>
+      <p>Click the 🌙 button in the navigation bar to switch between light and dark modes for better viewing comfort.</p>
+
+      <h3>Who made this?</h3>
+      <p>This app was created by Anna Chapko in 2025.</p>
+    </section>
+
+    <section class="tutorial-videos" style="margin-top: 2rem;">
+      <h2>🎥 YouTube Video Tutorials</h2>
+      <div class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 1rem;">
+
+        <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/8mAITcNt710"
+            title="JavaScript Full Course" frameborder="0" allowfullscreen></iframe>
+          <p style="text-align:center; margin-top: 0.5rem;">JavaScript Full Course – freeCodeCamp</p>
+        </div>
+
+        <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/zOjov-2OZ0E"
+            title="Intro to CS - Harvard" frameborder="0" allowfullscreen></iframe>
+          <p style="text-align:center; margin-top: 0.5rem;">Harvard CS50: What is Programming?</p>
+        </div>
+
+        <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/pB0WvcxTbCA"
+            title="HTML Crash Course" frameborder="0" allowfullscreen></iframe>
+          <p style="text-align:center; margin-top: 0.5rem;">HTML Crash Course – Traversy Media</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="vimeo-videos" style="margin-top: 2rem;">
+      <h2>🎥 Additional Vimeo Tutorials</h2>
+      <div class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 1rem;">
+
+        <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+          <iframe src="https://player.vimeo.com/video/303294688" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+          <p style="text-align:center; margin-top: 0.5rem;">Python Programming Basics</p>
+        </div>
+
+        <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+          <iframe src="https://player.vimeo.com/video/80093925" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+          <p style="text-align:center; margin-top: 0.5rem;">Machine Learning with Scikit-Learn</p>
+        </div>
+
+        <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+          <iframe src="https://player.vimeo.com/video/19569529" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+          <p style="text-align:center; margin-top: 0.5rem;">Neural Network in C++ Tutorial</p>
+        </div>
+
+        <div class="video-wrapper" style="aspect-ratio: 16 / 9;">
+          <iframe src="https://player.vimeo.com/video/477329411" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+          <p style="text-align:center; margin-top: 0.5rem;">Git Tutorial for Beginners</p>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="extra-resources" style="margin-top: 2rem;">
+      <h2>📚 More Computer Science Resources</h2>
+      <ul>
+        <li><a href="https://www.freecodecamp.org/" target="_blank" rel="noopener">freeCodeCamp – Interactive coding tutorials</a></li>
+        <li><a href="https://www.codecademy.com/" target="_blank" rel="noopener">Codecademy – Learn by doing (free & paid)</a></li>
+        <li><a href="https://www.theodinproject.com/" target="_blank" rel="noopener">The Odin Project – Full-stack curriculum</a></li>
+        <li><a href="https://www.khanacademy.org/computing/computer-science" target="_blank" rel="noopener">Khan Academy – CS Basics</a></li>
+        <li><a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener">Harvard CS50 – Intro to Computer Science</a></li>
+        <li><a href="https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/" target="_blank" rel="noopener">MIT OCW – EECS Courses</a></li>
+        <li><a href="https://www.edx.org/learn/computer-science" target="_blank" rel="noopener">edX – CS from top universities</a></li>
+        <li><a href="https://www.udacity.com/courses/all" target="_blank" rel="noopener">Udacity – CS & AI Nanodegrees</a></li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web" target="_blank" rel="noopener">MDN Web Docs – HTML, CSS, JS</a></li>
+        <li><a href="https://www.w3schools.com/" target="_blank" rel="noopener">W3Schools – Web dev tutorials</a></li>
+        <li><a href="https://docs.python.org/3/" target="_blank" rel="noopener">Python.org – Official Python docs</a></li>
+        <li><a href="https://cplusplus.com/" target="_blank" rel="noopener">cplusplus.com – C++ reference</a></li>
+        <li><a href="https://leetcode.com/" target="_blank" rel="noopener">LeetCode – Coding practice & interviews</a></li>
+        <li><a href="https://www.hackerrank.com/" target="_blank" rel="noopener">HackerRank – Practice algorithms</a></li>
+        <li><a href="https://codeforces.com/" target="_blank" rel="noopener">Codeforces – Competitive programming</a></li>
+        <li><a href="https://exercism.org/" target="_blank" rel="noopener">Exercism – Learn 60+ languages</a></li>
+        <li><a href="https://projecteuler.net/" target="_blank" rel="noopener">Project Euler – Math puzzles with code</a></li>
+        <li><a href="https://teachyourselfcs.com/" target="_blank" rel="noopener">TeachYourselfCS – Self-guided CS education</a></li>
+        <li><a href="https://interviewing.io/" target="_blank" rel="noopener">interviewing.io – Free mock interviews</a></li>
+        <li><a href="https://www.byte-by-byte.com/" target="_blank" rel="noopener">Byte by Byte – Interview prep (DP focus)</a></li>
+        <li><a href="https://visualgo.net/en" target="_blank" rel="noopener">VisuAlgo – Algorithm visualization</a></li>
+        <li><a href="https://explainshell.com/" target="_blank" rel="noopener">ExplainShell – Understand shell commands</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Anna Chapko</p>
+    <p>Fonts: JetBrains Mono, Inter • Libraries: jQuery, p5.js</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Dark mode toggle
+    $("#darkToggle").click(function () {
+      $("body").toggleClass("dark-mode");
+      const pressed = $("#darkToggle").attr("aria-pressed") === "true";
+      $("#darkToggle").attr("aria-pressed", !pressed);
+    });
+  </script>
+</body>
+
+</html>
